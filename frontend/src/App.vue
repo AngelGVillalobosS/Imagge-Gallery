@@ -1,11 +1,24 @@
-<script setup></script>
+<script setup>
+import { Icon } from '@iconify/vue';
+import ImageGrid from './components/ImageGrid.vue';
+
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <nav class="navbar bg-body-secondary sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <Icon icon="mdi:clock" color="black" height="24" width="30" class="d-inline-block align-text-top"/>
+        Image Gallery | Tempo
+      </a>
+      <button class="btn">
+        <Icon icon="mdi:restart"  height="24"/>
+      </button>
+    </div>
+  </nav>
+  <div class="container">
+    <ImageGrid />
+  </div>
 </template>
 
 <style scoped></style>
