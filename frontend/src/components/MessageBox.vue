@@ -1,5 +1,4 @@
 <script setup>
-import { Icon } from '@iconify/vue';
 import {ref} from 'vue';
 
 const messages = ref(['Hola', 'Cómo estas?', 'Bien gracias por preguntar', 'Hola mundo', 'Adios mundo', 'Chao chao',])
@@ -22,12 +21,12 @@ function addMessage(message) {
     <div class=" container">
         <div class="input-group flex-nowrap">
             <span class="input-group-text" id="addon-wrapping">
-                <Icon icon="material-symbols-light:alternate-email" />
+                <Icon icon="material-symbols-light:upload-file" />
             </span>
             <input type="text" id="msgBox" class="form-control" :placeholder="username" aria-label="Username"
                 aria-describedby="addon-wrapping" maxlength="256" v-model="currentMsg">
             <button type="button" class="btn btn-outline-secondary bg-light" @click="addMessage(currentMsg)">
-                <Icon icon="mdi:send"/>
+                <Icon icon="material-symbols-light:send"/>
             </button>
         </div>
     </div>

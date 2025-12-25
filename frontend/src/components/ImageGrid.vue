@@ -1,5 +1,4 @@
 <script setup>
-import { Icon } from "@iconify/vue";
 const images = [
     "https://cdn-icons-png.flaticon.com/512/9584/9584876.png",
     "https://cdn-icons-png.flaticon.com/512/10278/10278187.png",
