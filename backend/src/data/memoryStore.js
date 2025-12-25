@@ -54,4 +54,4 @@ const memoryStore = {
     }
 };
 
-module.exports = memoryStore;s
+module.exports = memoryStore;

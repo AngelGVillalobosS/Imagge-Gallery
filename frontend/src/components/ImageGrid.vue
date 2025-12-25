@@ -7,8 +7,6 @@ const images = [
     "https://images.pexels.com/photos/1921168/pexels-photo-1921168.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
 ]
 
-// console.log(images[0]);
-
 </script>
 
 <template>
@@ -24,7 +22,7 @@ const images = [
                             <p class="">{{ image }}</p>
                         </div>
                         <div class="row small">
-                            <Icon icon="mdi:file" style="color: gray" />
+                            <Icon icon="material-symbols-light:file" style="color: gray" />
                         </div>
                     </div>
                 </div>

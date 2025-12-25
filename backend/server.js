@@ -1,55 +1,69 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// // Conexión a MongoDB
-// mongoose.connect(process.env.MONGODB_URI)
-//   .then(() => console.log('Conectado a MongoDB'))
-//   .catch(err => console.error('Error de conexión:', err));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
-// Rutas de ejemplo
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Backend funcionando' });
+const photosRouter = require("./src/routes/photos");
+const chatRouter = require("./src/routes/chat");
+
+app.use("/api/photos", photosRouter);
+app.use("/api/chat", chatRouter);
+
+app.get("api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Backend is working",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// // Modelo de ejemplo (backend/models/Item.js)
-// const itemSchema = new mongoose.Schema({
-//   name: String,
-//   description: String,
-//   createdAt: { type: Date, default: Date.now }
-// });
+app.get("/", (req, res) => {
+  res.json({
+    message: "API for Gallery and ChatBox",
+    endpoints: {
+      photos: "/api/photos",
+      chat: "/api/chat",
+      health: "/api/health",
+    },
+  });
+});
 
-// const Item = mongoose.model('Item', itemSchema);
+// Rutas no encontradas
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Ruta no encontrada",
+    path: req.originalUrl,
+  });
+});
 
-// // CRUD de ejemplo
-// app.get('/api/items', async (req, res) => {
-//   try {
-//     const items = await Item.find();
-//     res.json(items);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
+// Control de errores
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  res.status(500).json({
+    error: "Internal server error",
+    message: err.message,
+  });
+});
 
-// app.post('/api/items', async (req, res) => {
-//   try {
-//     const newItem = new Item(req.body);
-//     await newItem.save();
-//     res.status(201).json(newItem);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// });
-
-// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Backend ejecutandose en el puerto: ${PORT}`);
+  console.log("Endpoints disponibles:");
+  console.log("   GET  /              - Documentación");
+  console.log("   GET  /api/health    - Estado del servidor");
+  console.log("   GET  /api/photos    - Obtener fotos");
+  console.log("   POST /api/photos    - Subir foto");
+  console.log("   GET  /api/chat      - Obtener mensajes");
+  console.log("   POST /api/chat      - Enviar mensaje");
 });
