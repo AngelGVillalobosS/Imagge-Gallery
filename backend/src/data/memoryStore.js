@@ -44,7 +44,7 @@ const memoryStore = {
         };
     },
 
-    getLastMessages(limit = 5){
+    getLastMessages(limit = 4){
         return this.messages.slice(0, limit);
     },
 

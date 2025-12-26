@@ -7,16 +7,28 @@ const api = axios.create({
   },
 })
 
-// Configurar límite para imágenes grandes (base64 puede ser grande)
-api.defaults.maxContentLength = 50 * 1024 * 1024 // 50MB
-api.defaults.maxBodyLength = 50 * 1024 * 1024 // 50MB
+api.defaults.maxContentLength = 50 * 1024 * 1024
+api.defaults.maxBodyLength = 50 * 1024 * 1024
 
-// Interceptor para manejar errores globalmente
+// Interceptor para manejar errores
+/* api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('Error en la petición:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.message,
+    })
+    return Promise.reject(error)
+  },
+) */
+
+// Manejo de errores globalmente
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     console.error('Request Error:', error)
-
     // Manejo de errores específicos
     if (error.response) {
       console.error('Response error:', error.response.data)
@@ -152,7 +164,7 @@ export function fileToBase64(file) {
 export async function checkServerHealth() {
   try {
     const response = await api.get('/health')
-    console.log('response', response)
+    console.log('ServerHealthResponse', response)
     return response
   } catch (error) {
     console.error('Error verifying server status:', error)

@@ -22,7 +22,7 @@ const sending = ref(false);
 const lastMessages = ref([]);
 
 watch(() => props.messages, () => {
-    lastMessages.value = props.messages.slice(-4);
+    lastMessages.value = props.messages.slice(0, 4);
 }, { immediate: true })
 
 const sendMessage = async () => {
@@ -36,7 +36,7 @@ const sendMessage = async () => {
 
     sending.value = true;
     try {
-        await emit('send-message', currentMsg.value.trim());
+        emit('send-message', currentMsg.value.trim());
         currentMsg.value = '';
     } catch (error) {
         console.error('Error at sending message', error);
@@ -84,7 +84,7 @@ const handleKeyPress = (event) => {
                 <span class="input-group-text" id="addon-wrapping">
                     <Icon icon="material-symbols-light:upload-file" />
                 </span>
-                <input type="text" id="msgBox" class="form-control" :placeholder="'Dí algo ' + username"
+                <input type="text" id="msgBox" class="form-control" :placeholder="'Dí algo ' + user"
                     aria-label="Username" aria-describedby="addon-wrapping" maxlength="255" v-model="currentMsg">
                 <button type="button" class="btn btn-outline-secondary bg-light" @click="addMessage(currentMsg)">
                     <Icon icon="material-symbols-light:send" />
