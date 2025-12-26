@@ -19,7 +19,6 @@ const props = defineProps({
 
 const emit = defineEmits(['upload-photo']);
 
-const currentPage = ref(0);
 const fileInput = ref(null);
 
 const formatDate = (dateString) => {
@@ -95,111 +94,61 @@ const handleFileSelect = async (event) => {
     reader.readAsDataURL(file);
 };
 
-const changePage = (page) => {
-    const totalPages = Math.ceil(props.photos.length / 20);
-    if (page >= 0 && page < totalPages) {
-        currentPage.value = page;
-    }
-};
-
-const visiblePhotos = computed(() => {
-    const start = currentPage.value * 20;
-    const end = start + 20;
-    return props.photos.slice(start, end);
-});
-
-watch([() => props.photos, currentPage], () => {
-    const start = currentPage.value * 20;
-    const end = start + 20;
-    visiblePhotos.value = props.photos.slice(start, end);
-}, { immediate: true });
-
-const totalPages = computed(() => {
-    return Math.ceil(props.photos.length / 20);
-});
-
-const getFileSize = (base64) => {
-    if (!base64) return '0 KB';
-    const stringLength = base64.length - (base64.split(',')[0].length + 1);
-    const sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
-
-    if (sizeInBytes < 1024) {
-        return `${Math.round(sizeInBytes)} bytes`;
-    } else if (sizeInBytes < 1024 * 1024) {
-        return `${(sizeInBytes / 1024).toFixed(1)} KB`;
-    } else {
-        return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
-    }
-};
 
 </script>
 
 <template>
-    <!-- Mensaje cuando no hay fotos -->
-    <div v-if="photos.length === 0" class="col-12 text-center py-5  h-100">
-        <Icon icon="material-symbols-light:hide-image" class="display-1 text-secondary" />
-        <h5 class="text-secondary">No hay fotos todavía</h5>
-        <p class="text-secondary">¡Sé el primero en subir una foto!</p>
-    </div>
-    <div class="container text-center"> <!-- grid de las imagenes -->
-        <div class="row">
-            <div class="col-12 col-md-6 col-lg-4 mt-4 mb-2" v-for="(photo, index) in photos" :key="index">
-                <div class="card h-100">
-                    <div class="card-body d-flex align-items-center justify-content-center">
-                        <img :src="photo.base64" class="img-fluid mx-auto d-block" alt="Image" width="250px">
-                    </div>
-                    <div class="card-footer small bg-body-secondary">
-                        <div class="row small text-black font-monospace">
-                            <span>
-                                <Icon icon="mdi:account" class="me-1" />
-                                {{ photo.user }}
-                            </span>
-                            <span class="text-secondary">
-                                {{ formatDate(photo.date) }}
-                            </span>
-                            <p :title="photo.originalFilename || photo.filename">
-                                <Icon icon="material-symbols:image" /> {{ photo.originalFilename || photo.filename }}
-                            </p>
+    <div class="container text-center">
+        <div v-if="loading" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando....=</span>
+            </div>
+            <p class="text-secondary mt-2">Cargando fotos...</p>
+        </div>
+        <div v-else>
+            <!-- Mensaje cuando no hay fotos -->
+            <div v-if="photos.length === 0" class="col-12 text-center py-5  h-100">
+                <Icon icon="material-symbols-light:hide-image" class="display-1 text-secondary" />
+                <h5 class="text-secondary">No hay fotos todavía</h5>
+                <p class="text-secondary">¡Sé el primero en subir una foto!</p>
+            </div>
+            <div class="container text-center"> <!-- grid de las imagenes -->
+                <div class="row">
+                    <div class="col-12 col-md-6 col-lg-4 mt-4 mb-2" v-for="(photo, index) in photos" :key="index">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center justify-content-center">
+                                <img :src="photo.base64" class="img-fluid mx-auto d-block" alt="Image" width="250px">
+                            </div>
+                            <div class="card-footer small bg-body-secondary">
+                                <div class="row small text-black font-monospace">
+                                    <span>
+                                        <Icon icon="mdi:account" class="me-1" />
+                                        {{ photo.user }}
+                                    </span>
+                                    <span class="text-secondary">
+                                        {{ formatDate(photo.date) }}
+                                    </span>
+                                    <p :title="photo.originalFilename || photo.filename">
+                                        <Icon icon="material-symbols:image" /> {{ photo.originalFilename ||
+                                            photo.filename
+                                        }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row mt-4" v-if="totalPages > 1"> <!-- Paginas -->
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" :class="{ disabled: currentPage === 0 }">
-                        <button class="page-link" @click="changePage(currentPage - 1)">Anterior</button>
-                    </li>
-                    <li class="page-item" v-for="page in totalPages" :key="page"
-                        :class="{ active: currentPage === page - 1 }">
-                        <button class="page-link" @click="changePage(page - 1)">
-                            {{ page }}
-                        </button>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages - 1 }">
-                        <button class="page-link" @click="changePage(currentPage + 1)">Siguiente</button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        <!-- Contador de fotos -->
-        <div class="row mt-2">
-            <div class="col-12">
-                <p class="text-secondary small">
-                    Mostrando {{ visiblePhotos.length }} de {{ photos.length }} fotos
-                    <span v-if="totalPages > 1">(Página {{ currentPage + 1 }} de {{ totalPages }})</span>
-                </p>
+
+            <input type="file" ref="fileInput" accept="image/*" @change="handleFileSelect" class="d-none"
+                id="fileInput" />
+
+            <div class="mt-4 mb-5 mx-auto"> <!-- Subir foto -->
+                <label for="fileInput" class="btn btn-primary">
+                    <Icon icon="material-symbols-light:upload" class="me-2" />
+                    Subir Nueva Foto
+                </label>
             </div>
-        </div>
-
-        <input type="file" ref="fileInput" accept="image/*" @change="handleFileSelect" class="d-none" id="fileInput" />
-
-        <div class="mt-4 mb-5"> <!-- Subir foto -->
-            <label for="fileInput" class="btn btn-primary">
-                <Icon icon="mdi:upload" class="me-2" />
-                Subir Nueva Foto
-            </label>
         </div>
     </div>
 </template>
