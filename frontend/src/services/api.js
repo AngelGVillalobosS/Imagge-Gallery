@@ -10,20 +10,6 @@ const api = axios.create({
 api.defaults.maxContentLength = 50 * 1024 * 1024
 api.defaults.maxBodyLength = 50 * 1024 * 1024
 
-// Interceptor para manejar errores
-/* api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('Error en la petición:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      message: error.message,
-    })
-    return Promise.reject(error)
-  },
-) */
-
 // Manejo de errores globalmente
 api.interceptors.response.use(
   (response) => response.data,
@@ -82,20 +68,25 @@ export async function getPhotos(page = 0, limit = 20) {
   }
 }
 
-export async function uploadPhoto(user, base64) {
+export async function uploadPhoto(user, base64, filename, originalFilename) {
   try {
     if (!base64.startsWith('data:image/')) {
-      throw new Error('The file isnt a valid image')
+      throw new Error('El archivo no es una imagen válida')
     }
 
-    const response = await api.post('/photos', { user, base64 })
+    const response = await api.post('/photos', {
+      user,
+      base64,
+      filename,
+      originalFilename,
+    })
     return response
   } catch (error) {
-    console.error('Error at upload the image:', error)
+    console.error('Error al subir foto:', error)
     return {
       success: false,
       photo: null,
-      error: error.error || 'Error at upload the image',
+      error: error.error || 'Error al subir la foto',
     }
   }
 }
@@ -141,19 +132,23 @@ export async function sendMessage(user, text) {
 export function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith('image/')) {
-      reject(new Error('The file must be and image'))
+      reject(new Error('El archivo debe ser una imagen'))
       return
     }
 
-    // Validar tamaño máximo (10MB)
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const maxSize = 10 * 1024 * 1024
     if (file.size > maxSize) {
-      reject(new Error('The image its to large (Maximum 10MB)'))
+      reject(new Error('La imagen es demasiado grande (máximo 10MB)'))
       return
     }
 
     const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
+    reader.onload = () =>
+      resolve({
+        base64: reader.result,
+        filename: `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`,
+        originalFilename: file.name,
+      })
     reader.onerror = (error) => reject(error)
     reader.readAsDataURL(file)
   })

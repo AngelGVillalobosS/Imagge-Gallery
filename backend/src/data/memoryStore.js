@@ -12,6 +12,8 @@ const memoryStore = {
         const newPhoto = {
             id: ++this.counters.photoId,
             user: photoData.user,
+            filename: photoData.filename,
+            originalFilename: photoData.originalFilename,
             base64: photoData.base64,
             date: new Date().toISOString(),
         };

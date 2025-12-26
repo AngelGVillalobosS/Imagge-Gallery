@@ -15,36 +15,43 @@ router.get("/", (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, error: "Internal error" });
+    res.status(500).json({ success: false, error: "Error interno" });
   }
 });
 
 // POST /api/photos
 router.post("/", (req, res) => {
   try {
-    const { user, base64 } = req.body;
+    const { user, filename, originalFilename, base64 } = req.body;
 
     if (!user || !base64) {
       return res.status(400).json({
         success: false,
-        error: "Missed required data",
-      });
-    }
-    if (!memoryStore.users.includes(user)) {
-      return res.status(400).json({
-        success: false,
-        error: "Not valid user.",
+        error: "Faltan datos requeridos",
       });
     }
 
-    const newPhoto = memoryStore.addPhoto({ user, base64 });
+    if (!memoryStore.users.includes(user)) {
+      return res.status(400).json({
+        success: false,
+        error: "Usuario no válido",
+      });
+    }
+
+    const newPhoto = memoryStore.addPhoto({
+      user,
+      filename: filename || "imagen.jpg",
+      originalFilename: originalFilename || "imagen.jpg",
+      base64,
+    });
+
     res.status(201).json({
       success: true,
       photo: newPhoto,
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, error: "Internal error" });
+    res.status(500).json({ success: false, error: "Error interno" });
   }
 });
 
