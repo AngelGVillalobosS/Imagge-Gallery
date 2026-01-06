@@ -1,10 +1,16 @@
 import axios from 'axios'
 
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const baseURL = isDev 
+  ? 'http://localhost:3000/api' 
+  : 'https://imagge-gallery-backend.onrender.com/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 })
 
 api.defaults.maxContentLength = 50 * 1024 * 1024
@@ -173,8 +179,8 @@ export async function checkServerHealth() {
 
 export async function getStorageStatus() {
   try {
-    const response = await axios.get('http://localhost:3000/api/storage-status')
-    return response.data
+    const response = await api.get('/storage-status')
+    return response
   } catch (error) {
     console.error('Error getting storage status:', error)
     return null

@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://angelgvillaloboss-image-gallery.netlify.app"],
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
@@ -20,7 +20,7 @@ const chatRouter = require("./src/routes/chat");
 app.use("/api/photos", photosRouter);
 app.use("/api/chat", chatRouter);
 
-app.get("api/health", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
     message: "Backend is working",
